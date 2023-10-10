@@ -12,7 +12,7 @@ you can view all the calculations you have made in the history by clicking on th
 
 ![Screenshot_20231011-001554](https://github.com/Karam-12-6/my-flutter-projects/assets/121106806/b16a9b29-1fa9-42a9-9374-55dcc30a4069)
 
-you can continue editing any calculation by clicking on it ,for example when we press the first calculion in the history ,the history screen will close automatically and we will see this: 
+you can continue editing any calculation by clicking on it ,for example when we press the first calculation in the history ,the history screen will close automatically and we will see this: 
 ![Screenshot_20231011-001632](https://github.com/Karam-12-6/my-flutter-projects/assets/121106806/4f23a576-7c52-4320-8e2e-b5390e72ae7a)
 
 
