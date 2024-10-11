@@ -3,6 +3,7 @@ import 'package:calculator_app/widgets/drawer_child.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 class CalculatorScreen extends StatelessWidget {
   CalculatorScreen({super.key});
@@ -18,7 +19,7 @@ class CalculatorScreen extends StatelessWidget {
             backgroundColor: Colors.white,
             leading: IconButton(
               onPressed: () {
-                  scaffoldKey.currentState!.openDrawer();
+                scaffoldKey.currentState!.openDrawer();
               },
               icon: const Icon(
                 Icons.history,
@@ -28,7 +29,6 @@ class CalculatorScreen extends StatelessWidget {
           ),
           drawer: const Drawer(
             child: DrawerChild(),
-
           ),
           body: Container(
             width: MediaQuery.of(context).size.width,
@@ -45,7 +45,8 @@ class CalculatorScreen extends StatelessWidget {
                     controller: context
                         .watch<CalculationController>()
                         .expressionController,
-                    style: TextStyle(fontSize: MediaQuery.of(context).size.height/13),
+                    style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.height / 13),
                     readOnly: true,
                     autofocus: true,
                     showCursor: true,
@@ -89,6 +90,7 @@ class CalculatorScreen extends StatelessWidget {
     return Consumer<CalculationController>(
       builder: (context, controller, child) {
         List<String> characters = [
+          'C',
           '(',
           ')',
           '÷',
@@ -104,86 +106,50 @@ class CalculatorScreen extends StatelessWidget {
           '2',
           '3',
           '+',
+          '.',
+          '0',
+          '=',
         ];
-        List<Widget> buttons = [
-          CustomCalculatorButton(
-              character: 'C', onPressed: () => controller.emptyExpression()),
-        ];
-        buttons.addAll([
-          for (String char in characters)
-            CustomCalculatorButton(
-                character: char,
-                onPressed: () => controller.addToExpression(char))
-        ]);
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height/1.5,
-          margin: const EdgeInsets.only(top: 7),
+        return Expanded(
           child: Column(
             children: [
               Expanded(
-                child: GridView(
-                  padding: const EdgeInsets.fromLTRB(6, 17, 6, 0),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 11,
-                    mainAxisSpacing: 14,
-                  ),
-                  children: buttons,
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height/6.6,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: CustomCalculatorButton(
-                          character: '.',
-                          onPressed: () => controller.addToExpression('.')),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: CustomCalculatorButton(
-                          character: '0',
-                          onPressed: () => controller.addToExpression('0')),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(11.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Feedback.forTap(context);
-                          controller.getExpressionResult(context);
-                        },
-                        
-                        child: Container(
-                          height: MediaQuery.of(context).size.height / 10,
-                          width: MediaQuery.of(context).size.width / 2.3,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 2,
-                                offset: const Offset(4, 8),
-                                spreadRadius: 0.7,
-                              ),
-                            ],
-                          ),
-                          child: const Center(
-                            child: Text(
-                              '=',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 30),
-                            ),
-                          ),
+                child: SizedBox(
+                  width: min(MediaQuery.of(context).size.width, 420),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return GridView.builder(
+                        padding: const EdgeInsets.fromLTRB(6, 17, 6, 0),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 11,
+                          mainAxisSpacing: 14,
                         ),
-                      ),
-                    ),
-                  ],
+                        itemCount: characters.length,
+                        itemBuilder: (context, index) {
+                          String char = characters[index];
+                          if (index > 0 && index < characters.length - 1) {
+                            return CustomCalculatorButton(
+                                character: char,
+                                onPressed: () => controller.addToExpression(char));
+                          } else if (index == 0) {
+                            return CustomCalculatorButton(
+                                character: char,
+                                onPressed: () => controller.emptyExpression());
+                          }
+                          return AspectRatio(
+                            aspectRatio: 2,
+                            child: CustomCalculatorButton(
+                                character: char,
+                                color: Colors.green,
+                                textColor: Colors.white,
+                                onPressed: () =>
+                                    controller.getExpressionResult(context)),
+                          );
+                        },
+                      );
+                    }
+                  ),
                 ),
               ),
             ],
@@ -198,11 +164,15 @@ class CustomCalculatorButton extends StatelessWidget {
   final String character;
   final VoidCallback onPressed;
   final Color? color;
+  final double? width;
+  final Color textColor;
   const CustomCalculatorButton({
     super.key,
     required this.character,
     required this.onPressed,
+    this.textColor = Colors.green,
     this.color = Colors.white,
+    this.width,
   });
 
   @override
@@ -213,8 +183,9 @@ class CustomCalculatorButton extends StatelessWidget {
         onPressed();
       },
       child: Container(
-        height: MediaQuery.of(context).size.height / 8.45,
-        width: MediaQuery.of(context).size.width / 4.35,
+        // height: MediaQuery.of(context).size.height / 8.45,
+        // width: MediaQuery.of(context).size.width / 4.35,
+        width: width ?? 10,
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
@@ -230,7 +201,7 @@ class CustomCalculatorButton extends StatelessWidget {
         child: Center(
           child: Text(
             character,
-            style: const TextStyle(color: Colors.green, fontSize: 18),
+            style: TextStyle(color: textColor, fontSize: 18),
           ),
         ),
       ),

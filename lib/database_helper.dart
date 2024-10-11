@@ -40,7 +40,7 @@ class DatabaseHelper {
     await db.insert(
       'calculations',
       calculation.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      //conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -88,7 +88,7 @@ class DatabaseHelper {
 
     final db = await database;
 
-    final List<Map<String, dynamic>> maps = await db.query('calculations');
+    final List<Map<String, dynamic>> maps = await db.query('calculations', orderBy: 'timestamp DESC');
 
     return List.generate(maps.length, (i) {
       return Calculation.fromMap(maps[i]);

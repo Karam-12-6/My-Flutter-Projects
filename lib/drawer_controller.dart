@@ -3,9 +3,11 @@ import 'package:calculator_app/database_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+List<Calculation> calculations = [];
+Set<int> toDelete = {};
+
 class DrawerController extends ChangeNotifier {
   bool _checkBoxVisible = false;
-  List<Pair<Calculation, bool>> calculationCheckBox = [];
   set checkBoxVisible(bool value) {
     _checkBoxVisible = value;
     notifyListeners();
@@ -13,36 +15,40 @@ class DrawerController extends ChangeNotifier {
 
   bool get checkBoxVisible => _checkBoxVisible;
 
-  Pair<Calculation, bool>? findCalculation(int id) {
-    for (var calculation in calculationCheckBox) {
-      if (calculation.first.id == id) {
-        return calculation;
-      }
-    }
-    return null;
-  }
+  // Pair<Calculation, bool>? findCalculation(int id) {
+  //   for (var calculation in calculationCheckBox) {
+  //     if (calculation.first.id == id) {
+  //       return calculation;
+  //     }
+  //   }
+  //   return null;
+  // }
 
+  void delete() {
+    DatabaseHelper().deleteCalculations(toDelete.toList());
+    checkBoxVisible = false;
+    notifyListeners();
+  }
+}
+
+class SingleCalculationController extends ChangeNotifier {
   void setCalculationCheckBox(int index) {
-    calculationCheckBox[index].second = !calculationCheckBox[index].second;
+    int id = calculations[index].id!;
+    bool alreadyChecked = toDelete.contains(id);
+    if (alreadyChecked) {
+      toDelete.remove(id);
+    } else {
+      toDelete.add(id);
+    }
     notifyListeners();
   }
 
   void selectAll() {
-    for (var checked in calculationCheckBox) {
-      checked.second = true;
+    if (toDelete.length != calculations.length) {
+      toDelete.addAll(calculations.map((e) => e.id!).toList());
+    } else {
+      toDelete.clear();
     }
-    notifyListeners();
-  }
-
-  void delete() {
-    List<int> checkedCalculations = [];
-    for (var calculation in calculationCheckBox) {
-      if (calculation.second == true) {
-        checkedCalculations.add(calculation.first.id!);
-      }
-    }
-    DatabaseHelper().deleteCalculations(checkedCalculations);
-    //checkBoxVisible = false;
     notifyListeners();
   }
 }
