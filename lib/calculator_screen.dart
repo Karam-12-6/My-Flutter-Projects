@@ -110,49 +110,43 @@ class CalculatorScreen extends StatelessWidget {
           '0',
           '=',
         ];
+        // var [width, height] = [MediaQuery.of(context).size.width, MediaQuery.of(context).size.height];
+        double width = MediaQuery.of(context).size.width;
         return Expanded(
-          child: Column(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  width: min(MediaQuery.of(context).size.width, 420),
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return GridView.builder(
-                        padding: const EdgeInsets.fromLTRB(6, 17, 6, 0),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          crossAxisSpacing: 11,
-                          mainAxisSpacing: 14,
-                        ),
-                        itemCount: characters.length,
-                        itemBuilder: (context, index) {
-                          String char = characters[index];
-                          if (index > 0 && index < characters.length - 1) {
-                            return CustomCalculatorButton(
-                                character: char,
-                                onPressed: () => controller.addToExpression(char));
-                          } else if (index == 0) {
-                            return CustomCalculatorButton(
-                                character: char,
-                                onPressed: () => controller.emptyExpression());
-                          }
-                          return AspectRatio(
-                            aspectRatio: 2,
-                            child: CustomCalculatorButton(
-                                character: char,
-                                color: Colors.green,
-                                textColor: Colors.white,
-                                onPressed: () =>
-                                    controller.getExpressionResult(context)),
-                          );
-                        },
-                      );
-                    }
-                  ),
-                ),
+          child: SizedBox(
+            width: min(width, 420),
+            // width: min((width*height)/20, 500),
+            // height: MediaQuery.of(context).size.height/1.5,
+            child: GridView.builder(
+              primary: true,
+              padding: const EdgeInsets.fromLTRB(6, 17, 6, 2),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: 11,
+                mainAxisSpacing: 14,
               ),
-            ],
+              // physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+
+              itemCount: characters.length,
+              itemBuilder: (context, index) {
+                String char = characters[index];
+                if (index > 0 && index < characters.length - 1) {
+                  return CustomCalculatorButton(
+                      character: char,
+                      onPressed: () => controller.addToExpression(char));
+                } else if (index == 0) {
+                  return CustomCalculatorButton(
+                      character: char,
+                      onPressed: () => controller.emptyExpression());
+                }
+                return CustomCalculatorButton(
+                    character: char,
+                    color: Colors.green,
+                    textColor: Colors.white,
+                    onPressed: () => controller.getExpressionResult(context));
+              },
+            ),
           ),
         );
       },
@@ -177,31 +171,34 @@ class CustomCalculatorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Feedback.forTap(context);
-        onPressed();
-      },
-      child: Container(
-        // height: MediaQuery.of(context).size.height / 8.45,
-        // width: MediaQuery.of(context).size.width / 4.35,
-        width: width ?? 10,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 2,
-              offset: const Offset(4, 8),
-              spreadRadius: 0.7,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          Feedback.forTap(context);
+          onPressed();
+        },
+        child: Container(
+          // height: MediaQuery.of(context).size.height / 8.45,
+          // width: MediaQuery.of(context).size.width / 4.35,
+          // width: width ?? 10,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 2,
+                offset: const Offset(4, 8),
+                spreadRadius: 0.7,
+              ),
+            ],
+          ),
+          child: Center(
+            child: Text(
+              character,
+              style: TextStyle(color: textColor, fontSize: 18),
             ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            character,
-            style: TextStyle(color: textColor, fontSize: 18),
           ),
         ),
       ),
